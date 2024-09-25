@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace MauiApp1
 {
@@ -12,7 +13,7 @@ namespace MauiApp1
             InitializeComponent();
         }
 
-        private void OnCounterClicked(object sender, EventArgs e)
+        private async void OnCounterClicked(object sender, EventArgs e)
         {
             count++;
 
@@ -24,10 +25,15 @@ namespace MauiApp1
             SemanticScreenReader.Announce(CounterBtn.Text);
 
 
-            Test();
+            var dataObjects = await Test();
+            //var task = Task.Run(Test);
+            //var dataObjects = task.Result;
+
+            CounterLbl.Text = dataObjects;
+            SemanticScreenReader.Announce(CounterLbl.Text);
         }
 
-        private void Test()
+        private async Task<string> Test()
         {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(URL);
@@ -36,13 +42,13 @@ namespace MauiApp1
             client.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json"));
 
+            await Task.Delay(2000);
             // List data response.
-            HttpResponseMessage response = client.GetAsync("").Result;
+            HttpResponseMessage response = await client.GetAsync("");
 
-            var dataObjects = response.Content.ReadAsStringAsync().Result;
+            return await response.Content.ReadAsStringAsync();
 
-            CounterLbl.Text = dataObjects;
-            SemanticScreenReader.Announce(CounterLbl.Text);
+            
         }
     }
 }
